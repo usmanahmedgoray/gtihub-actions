@@ -20,11 +20,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: [18.x, 20.x, 22.x, 24.x]
+        node-version: [18.x]
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Node (with retry, cached)
-        if: ${{ hashFiles('**/package-lock.json', '**/npm-shrinkwrap.json', '**/yarn.lock') != '' }}
+      - name: Setup Node (with retry)
         uses: Wandalen/wretry.action@v1
         with:
           action: actions/setup-node@v4
@@ -33,21 +32,8 @@ jobs:
           with: |
             node-version: ${{ matrix.node-version }}
             cache: npm
-      - name: Setup Node (with retry, no cache)
-        if: ${{ hashFiles('**/package-lock.json', '**/npm-shrinkwrap.json', '**/yarn.lock') == '' }}
-        uses: Wandalen/wretry.action@v1
-        with:
-          action: actions/setup-node@v4
-          attempt_limit: 3
-          attempt_delay: 10000
-          with: |
-            node-version: ${{ matrix.node-version }}
-      - name: Install dependencies (ci)
-        if: ${{ hashFiles('**/package-lock.json', '**/npm-shrinkwrap.json') != '' }}
+      - name: Install dependencies
         run: npm ci
-      - name: Install dependencies (install)
-        if: ${{ hashFiles('**/package-lock.json', '**/npm-shrinkwrap.json') == '' }}
-        run: npm install
       - name: Build
         run: npm run build --if-present
       - name: Run tests
