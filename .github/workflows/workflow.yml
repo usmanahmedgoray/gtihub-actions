@@ -6,19 +6,29 @@ on:
   pull_request:
     branches: ["main"]
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   build:
+    timeout-minutes: 30
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         node-version: [18.x, 20.x, 22.x, 24.x]
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+      - name: Setup Node (with retry)
+        uses: Wandalen/wretry.action@v1
         with:
-          node-version: ${{ matrix.node-version }}
-          cache: "npm"
+          action: actions/setup-node@v4
+          attempt_limit: 3
+          attempt_delay: 10000
+          with: |
+            node-version: ${{ matrix.node-version }}
+            cache: npm
       - name: Install dependencies
         run: npm ci
       - name: Build
