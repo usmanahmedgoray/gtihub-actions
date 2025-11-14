@@ -1,0 +1,12 @@
+{
+  "name": "github-actions",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "node index.js",
+    "test": "node test.js"
+  },
+  "author": "",
+  "license": "ISC"
+}
